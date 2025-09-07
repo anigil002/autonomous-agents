@@ -1,0 +1,42 @@
+{
+  "name": "health-check",
+  "description": "Comprehensive system health check and validation",
+  "usage": "/health-check [--detailed]",
+  "aliases": ["health", "check", "validate"],
+  "parameters": {
+    "detailed": {
+      "type": "boolean",
+      "description": "Include detailed diagnostic information",
+      "default": false
+    }
+  },
+  "workflow": [
+    {
+      "agent": "orchestrator",
+      "action": "health_coordination",
+      "description": "Coordinate comprehensive health check"
+    },
+    {
+      "agent": "system-analyzer",
+      "action": "system_validation",
+      "description": "Validate system configuration and capabilities"
+    },
+    {
+      "agent": "mcp-manager", 
+      "action": "mcp_health_check",
+      "description": "Check MCP server status and functionality"
+    },
+    {
+      "agent": "qa-engineer",
+      "action": "environment_testing",
+      "description": "Test development environment functionality"
+    },
+    {
+      "agent": "error-resolver",
+      "action": "issue_detection",
+      "description": "Detect and report any system issues"
+    }
+  ],
+  "estimated_time": "5-15 minutes",
+  "output": "Detailed health report with recommendations"
+}

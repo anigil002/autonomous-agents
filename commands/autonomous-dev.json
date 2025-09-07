@@ -1,0 +1,72 @@
+{
+  "name": "autonomous-dev",
+  "description": "Complete autonomous development pipeline from specifications to production",
+  "usage": "/autonomous-dev [specs-file]",
+  "aliases": ["auto-dev", "full-dev"],
+  "parameters": {
+    "specs_file": {
+      "type": "string",
+      "description": "Path to system specifications document",
+      "default": "specs.md"
+    }
+  },
+  "workflow": [
+    {
+      "agent": "orchestrator",
+      "action": "initialize_pipeline",
+      "description": "Initialize development pipeline and analyze requirements"
+    },
+    {
+      "agent": "system-analyzer", 
+      "action": "analyze_specifications",
+      "description": "Analyze system specifications and requirements"
+    },
+    {
+      "agent": "tech-stack-architect",
+      "action": "design_architecture",
+      "description": "Design system architecture and select technology stack"
+    },
+    {
+      "agent": "mcp-manager",
+      "action": "install_mcp_servers", 
+      "description": "Install required MCP servers including Context7 for research"
+    },
+    {
+      "agent": "web-developer",
+      "action": "research_technology_stack",
+      "description": "Research latest library versions and best practices using Context7"
+    },
+    {
+      "agent": "web-developer",
+      "action": "develop_application",
+      "description": "Develop complete full-stack application using researched best practices"
+    },
+    {
+      "agent": "qa-engineer",
+      "action": "comprehensive_testing",
+      "description": "Execute comprehensive testing suite"
+    },
+    {
+      "agent": "playwright-tester",
+      "action": "e2e_testing",
+      "description": "Perform end-to-end and UI testing"
+    },
+    {
+      "agent": "deployment-engineer", 
+      "action": "deploy_to_production",
+      "description": "Deploy application to production platforms"
+    },
+    {
+      "agent": "documentarian",
+      "action": "generate_documentation",
+      "description": "Generate comprehensive documentation"
+    },
+    {
+      "agent": "orchestrator",
+      "action": "final_validation",
+      "description": "Validate complete deployment and generate report"
+    }
+  ],
+  "estimated_time": "2-4 hours",
+  "output": "Live production application with complete documentation"
+}

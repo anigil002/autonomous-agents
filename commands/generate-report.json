@@ -1,0 +1,43 @@
+{
+  "name": "generate-report",
+  "description": "Generate comprehensive project report and deliverables",
+  "usage": "/generate-report [--type=full|summary|technical]",
+  "aliases": ["report", "deliverables"],
+  "parameters": {
+    "type": {
+      "type": "string",
+      "description": "Type of report to generate",
+      "options": ["full", "summary", "technical"],
+      "default": "full"
+    }
+  },
+  "workflow": [
+    {
+      "agent": "orchestrator",
+      "action": "report_coordination",
+      "description": "Coordinate comprehensive report generation"
+    },
+    {
+      "agent": "documentarian",
+      "action": "generate_documentation",
+      "description": "Generate complete project documentation"
+    },
+    {
+      "agent": "qa-engineer",
+      "action": "test_report_generation",
+      "description": "Generate comprehensive test reports"
+    },
+    {
+      "agent": "deployment-engineer",
+      "action": "deployment_report",
+      "description": "Generate deployment status and URLs"
+    },
+    {
+      "agent": "system-analyzer",
+      "action": "technical_specifications",
+      "description": "Generate technical specifications document"
+    }
+  ],
+  "estimated_time": "10-20 minutes", 
+  "output": "Comprehensive project report with all deliverables"
+}

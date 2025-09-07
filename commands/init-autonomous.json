@@ -1,0 +1,37 @@
+{
+  "name": "init-autonomous", 
+  "description": "Initialize autonomous development environment and analyze system",
+  "usage": "/init-autonomous [project-name]",
+  "aliases": ["init", "setup"],
+  "parameters": {
+    "project_name": {
+      "type": "string", 
+      "description": "Name of the project to initialize",
+      "default": "autonomous-project"
+    }
+  },
+  "workflow": [
+    {
+      "agent": "orchestrator",
+      "action": "system_initialization",
+      "description": "Initialize development environment"
+    },
+    {
+      "agent": "system-analyzer",
+      "action": "environment_analysis", 
+      "description": "Analyze system capabilities and requirements"
+    },
+    {
+      "agent": "mcp-manager",
+      "action": "verify_mcp_servers",
+      "description": "Verify MCP server installations"
+    },
+    {
+      "agent": "git-specialist",
+      "action": "initialize_repository",
+      "description": "Initialize Git repository with best practices"
+    }
+  ],
+  "estimated_time": "15-30 minutes",
+  "output": "Initialized development environment ready for autonomous development"
+}
