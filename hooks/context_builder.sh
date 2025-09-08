@@ -1,37 +1,49 @@
 #!/bin/bash
-# Context building hook - tracks all activities
+# Context Builder Hook
+# Tracks all development activities and builds comprehensive project context
 
-TOOL_NAME="$1"
-COMMAND="$2"
-TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
+set -euo pipefail
 
-# Initialize context file if it doesn't exist
-CONTEXT_FILE=".claude/temp/contextbuilder.txt"
-mkdir -p "$(dirname "$CONTEXT_FILE")"
+# Configuration
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+CONTEXT_DIR="$SCRIPT_DIR/../context"
+LOG_FILE="$SCRIPT_DIR/../logs/context_builder.log"
+ACTIVITY_LOG="$CONTEXT_DIR/activity.jsonl"
 
-if [[ ! -f "$CONTEXT_FILE" ]]; then
-    cat > "$CONTEXT_FILE" << 'EOL'
-# Claude Code Autonomous Development Context
-# This file tracks all activities and context throughout the development process
-# Generated automatically by the context building system
+# Create directories if they don't exist
+mkdir -p "$CONTEXT_DIR" "$(dirname "$LOG_FILE")"
 
-## Session Information
-- Session started: $(date)
-- Environment: Windows (WSL/Git Bash)
-- Working directory: $(pwd)
+# Logging function
+log() {
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" >> "$LOG_FILE"
+}
 
-## Development Progress
+# Get operation details
+OPERATION="${1:-unknown}"
+TARGET="${2:-}"
+USER="${USER:-$(whoami)}"
+SESSION_ID="${CLAUDE_SESSION_ID:-$(date +%s)}"
 
-EOL
-fi
+log "INFO: Context tracking for $OPERATION on $TARGET"
 
-# Append activity
-echo "### [$TIMESTAMP] $TOOL_NAME Activity" >> "$CONTEXT_FILE"
-echo "Command: $COMMAND" >> "$CONTEXT_FILE"
-echo "Status: Executed" >> "$CONTEXT_FILE"
-echo "" >> "$CONTEXT_FILE"
+# Main context building function
+main() {
+    log "INFO: Starting context building for $OPERATION"
+    
+    # Skip context building for certain operations
+    if [[ "$TARGET" =~ \.(log|tmp|cache)$ ]]; then
+        log "INFO: Skipping context building for $TARGET (excluded file type)"
+        exit 0
+    fi
+    
+    # Record activity
+    local timestamp=$(date -u +"%Y-%m-%dT%H:%M:%S.%3NZ")
+    local record="{\"timestamp\":\"$timestamp\",\"session\":\"$SESSION_ID\",\"operation\":\"$OPERATION\",\"target\":\"$TARGET\"}"
+    echo "$record" >> "$ACTIVITY_LOG"
+    
+    log "INFO: Context building completed for $OPERATION"
+    exit 0
+}
 
-# Keep context file size manageable (last 1000 lines)
-tail -n 1000 "$CONTEXT_FILE" > "$CONTEXT_FILE.tmp" && mv "$CONTEXT_FILE.tmp" "$CONTEXT_FILE"
-
-exit 0
+# Run main function
+main "$@"

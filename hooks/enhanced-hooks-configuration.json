@@ -1,0 +1,376 @@
+{
+  "hooks": {
+    "PreToolUse": {
+      "Edit": [
+        {
+          "command": ".claude/hooks/security_monitor.sh",
+          "description": "Security validation before file edits",
+          "timeout": 10000,
+          "failureAction": "block",
+          "priority": "critical"
+        },
+        {
+          "command": ".claude/hooks/context_builder.sh",
+          "description": "Track all development activities for context",
+          "timeout": 5000,
+          "failureAction": "warn",
+          "priority": "high",
+          "async": true
+        },
+        {
+          "command": ".claude/hooks/backup_files.sh",
+          "description": "Backup files before modifications",
+          "timeout": 15000,
+          "failureAction": "warn",
+          "priority": "medium",
+          "conditions": {
+            "fileSize": "> 100KB",
+            "fileTypes": [".ts", ".js", ".py", ".go", ".rs"]
+          }
+        }
+      ],
+      "Write": [
+        {
+          "command": ".claude/hooks/backup_files.sh",
+          "description": "Backup existing files before overwriting",
+          "timeout": 15000,
+          "failureAction": "warn",
+          "priority": "high"
+        },
+        {
+          "command": ".claude/hooks/validate_syntax.sh",
+          "description": "Validate file syntax before writing",
+          "timeout": 8000,
+          "failureAction": "block",
+          "priority": "high",
+          "conditions": {
+            "fileTypes": [".js", ".ts", ".py", ".json", ".yaml", ".yml"]
+          }
+        },
+        {
+          "command": ".claude/hooks/security_scan_content.sh",
+          "description": "Scan content for security issues",
+          "timeout": 12000,
+          "failureAction": "block",
+          "priority": "critical",
+          "conditions": {
+            "containsPatterns": ["password", "api_key", "secret", "token"]
+          }
+        }
+      ],
+      "Bash": [
+        {
+          "command": ".claude/hooks/command_validator.sh",
+          "description": "Validate bash commands for safety",
+          "timeout": 5000,
+          "failureAction": "block",
+          "priority": "critical",
+          "conditions": {
+            "dangerousCommands": ["rm -rf", "sudo rm", "mkfs", "dd", "> /dev/"]
+          }
+        },
+        {
+          "command": ".claude/hooks/resource_monitor.sh",
+          "description": "Monitor system resources before execution",
+          "timeout": 3000,
+          "failureAction": "warn",
+          "priority": "medium",
+          "async": true
+        }
+      ],
+      "Task": [
+        {
+          "command": ".claude/hooks/agent_selector.sh",
+          "description": "Validate agent selection and capabilities",
+          "timeout": 5000,
+          "failureAction": "warn",
+          "priority": "medium"
+        }
+      ]
+    },
+    "PostToolUse": {
+      "Edit": [
+        {
+          "command": "npx prettier --write {{file}}",
+          "description": "Auto-format files after editing",
+          "timeout": 10000,
+          "failureAction": "warn",
+          "priority": "low",
+          "conditions": {
+            "fileTypes": [".js", ".ts", ".jsx", ".tsx", ".css", ".scss", ".json", ".md"]
+          }
+        },
+        {
+          "command": ".claude/hooks/test_trigger.sh",
+          "description": "Trigger relevant tests after code changes",
+          "timeout": 30000,
+          "failureAction": "warn",
+          "priority": "high",
+          "async": true,
+          "conditions": {
+            "fileTypes": [".js", ".ts", ".py", ".go", ".rs"],
+            "directories": ["src", "lib", "components", "services"]
+          }
+        },
+        {
+          "command": ".claude/hooks/lint_check.sh",
+          "description": "Run linting after file modifications",
+          "timeout": 15000,
+          "failureAction": "warn",
+          "priority": "medium",
+          "conditions": {
+            "fileTypes": [".js", ".ts", ".py"]
+          }
+        },
+        {
+          "command": ".claude/hooks/context_update.sh",
+          "description": "Update project context after changes",
+          "timeout": 10000,
+          "failureAction": "warn",
+          "priority": "medium",
+          "async": true
+        }
+      ],
+      "Write": [
+        {
+          "command": ".claude/hooks/documentation_update.sh",
+          "description": "Update documentation after file creation",
+          "timeout": 20000,
+          "failureAction": "warn",
+          "priority": "medium",
+          "async": true,
+          "conditions": {
+            "fileTypes": [".js", ".ts", ".py", ".go", ".rs", ".api", ".schema"]
+          }
+        },
+        {
+          "command": ".claude/hooks/dependency_check.sh",
+          "description": "Check dependencies after package file changes",
+          "timeout": 25000,
+          "failureAction": "warn",
+          "priority": "high",
+          "conditions": {
+            "files": ["package.json", "requirements.txt", "go.mod", "Cargo.toml", "composer.json"]
+          }
+        },
+        {
+          "command": ".claude/hooks/build_trigger.sh",
+          "description": "Trigger build after configuration changes",
+          "timeout": 60000,
+          "failureAction": "warn",
+          "priority": "medium",
+          "async": true,
+          "conditions": {
+            "files": ["webpack.config.js", "vite.config.js", "tsconfig.json", ".env"]
+          }
+        }
+      ],
+      "Bash": [
+        {
+          "command": ".claude/hooks/command_logger.sh",
+          "description": "Log executed commands for audit trail",
+          "timeout": 3000,
+          "failureAction": "warn",
+          "priority": "low",
+          "async": true
+        },
+        {
+          "command": ".claude/hooks/resource_cleanup.sh",
+          "description": "Clean up temporary resources after command execution",
+          "timeout": 10000,
+          "failureAction": "warn",
+          "priority": "low",
+          "async": true
+        }
+      ],
+      "Task": [
+        {
+          "command": ".claude/hooks/agent_performance_tracker.sh",
+          "description": "Track agent performance metrics",
+          "timeout": 5000,
+          "failureAction": "warn",
+          "priority": "low",
+          "async": true
+        }
+      ]
+    },
+    "SessionStart": [
+      {
+        "command": ".claude/hooks/session_initializer.sh",
+        "description": "Initialize development session with context loading",
+        "timeout": 15000,
+        "failureAction": "warn",
+        "priority": "high"
+      },
+      {
+        "command": ".claude/hooks/environment_validator.sh",
+        "description": "Validate development environment setup",
+        "timeout": 10000,
+        "failureAction": "warn",
+        "priority": "high"
+      },
+      {
+        "command": ".claude/hooks/git_status_check.sh",
+        "description": "Check git repository status and uncommitted changes",
+        "timeout": 5000,
+        "failureAction": "warn",
+        "priority": "medium"
+      }
+    ],
+    "SessionEnd": [
+      {
+        "command": ".claude/hooks/session_summarizer.sh",
+        "description": "Generate session summary and handoff notes",
+        "timeout": 20000,
+        "failureAction": "warn",
+        "priority": "high"
+      },
+      {
+        "command": ".claude/hooks/context_archiver.sh",
+        "description": "Archive session context for future reference",
+        "timeout": 15000,
+        "failureAction": "warn",
+        "priority": "medium"
+      },
+      {
+        "command": ".claude/hooks/cleanup_temp_files.sh",
+        "description": "Clean up temporary files created during session",
+        "timeout": 10000,
+        "failureAction": "warn",
+        "priority": "low"
+      }
+    ],
+    "DeploymentStart": [
+      {
+        "command": ".claude/hooks/pre_deployment_validator.sh",
+        "description": "Validate system state before deployment",
+        "timeout": 30000,
+        "failureAction": "block",
+        "priority": "critical"
+      },
+      {
+        "command": ".claude/hooks/deployment_backup.sh",
+        "description": "Create backup before deployment",
+        "timeout": 60000,
+        "failureAction": "block",
+        "priority": "critical"
+      }
+    ],
+    "DeploymentEnd": [
+      {
+        "command": ".claude/hooks/post_deployment_validator.sh",
+        "description": "Validate deployment success and system health",
+        "timeout": 45000,
+        "failureAction": "warn",
+        "priority": "critical"
+      },
+      {
+        "command": ".claude/hooks/monitoring_activator.sh",
+        "description": "Activate post-deployment monitoring",
+        "timeout": 10000,
+        "failureAction": "warn",
+        "priority": "high"
+      }
+    ],
+    "TestStart": [
+      {
+        "command": ".claude/hooks/test_environment_setup.sh",
+        "description": "Setup test environment and dependencies",
+        "timeout": 30000,
+        "failureAction": "block",
+        "priority": "high"
+      }
+    ],
+    "TestEnd": [
+      {
+        "command": ".claude/hooks/test_cleanup.sh",
+        "description": "Clean up test environment and artifacts",
+        "timeout": 15000,
+        "failureAction": "warn",
+        "priority": "medium"
+      },
+      {
+        "command": ".claude/hooks/test_reporter.sh",
+        "description": "Generate and publish test reports",
+        "timeout": 20000,
+        "failureAction": "warn",
+        "priority": "medium"
+      }
+    ]
+  },
+  "globalSettings": {
+    "enableHooks": true,
+    "maxConcurrentHooks": 5,
+    "defaultTimeout": 30000,
+    "retryCount": 2,
+    "retryDelay": 1000,
+    "logLevel": "info",
+    "auditTrail": true,
+    "performanceMonitoring": true
+  },
+  "environments": {
+    "development": {
+      "enableAll": true,
+      "relaxedSecurity": false,
+      "verboseLogging": true
+    },
+    "staging": {
+      "enableAll": true,
+      "strictSecurity": true,
+      "performanceOptimized": true
+    },
+    "production": {
+      "enableCriticalOnly": true,
+      "strictSecurity": true,
+      "minimalLogging": true,
+      "prioritizePerformance": true
+    }
+  },
+  "notifications": {
+    "channels": {
+      "slack": {
+        "enabled": true,
+        "webhook": "SLACK_WEBHOOK_URL_FROM_ENV",
+        "channels": {
+          "critical": "#alerts-critical",
+          "high": "#development",
+          "medium": "#notifications",
+          "low": "#dev-logs"
+        }
+      },
+      "email": {
+        "enabled": true,
+        "smtp": "SMTP_CONFIG_FROM_ENV",
+        "recipients": {
+          "critical": ["admin@company.com"],
+          "high": ["dev-team@company.com"],
+          "medium": ["notifications@company.com"]
+        }
+      },
+      "webhook": {
+        "enabled": true,
+        "endpoints": {
+          "monitoring": "MONITORING_WEBHOOK_URL",
+          "ci_cd": "CI_CD_WEBHOOK_URL"
+        }
+      }
+    },
+    "rules": {
+      "hookFailure": {
+        "priority": "high",
+        "channels": ["slack", "email"],
+        "includeContext": true
+      },
+      "securityAlert": {
+        "priority": "critical",
+        "channels": ["slack", "email", "webhook"],
+        "immediateAlert": true
+      },
+      "deploymentEvent": {
+        "priority": "medium",
+        "channels": ["slack"],
+        "includeMetrics": true
+      }
+    }
+  }
+}
